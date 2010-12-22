@@ -41,3 +41,18 @@ sub append {
 }
 
 1;
+
+=head1 RATIONALE
+
+I searched for other "grouping" modules on CPAN
+but found none that supported basing one group off of another.
+Unsatisfied by the API of the modules I looked at,
+I borrowed their namespace and created my own implementation.
+
+=head1 SEE ALSO
+
+=for :list
+* L<Set::Groups>
+* L<Set::NestedGroups>
+
+=cut

@@ -1,0 +1,22 @@
+=head1 Set::DynamicGroups
+
+An object to manage dynamic groups of items.
+
+You can define groups of items based on explicit lists of members
+and build groups dynamically based on other groups.
+
+Useful for ACLs,
+applying transformations to groups of fields,
+or any other application where you'd like to base
+processing rules on groups and be flexible about what those groups contain.
+
+=head1 SEE ALSO
+
+I looked at these two modules (and borrowed their namespace),
+but was unsatisfied by their APIs
+and the lack of support for basing one group off of another.
+
+* L<Set::Groups>
+* L<Set::NestedGroups>
+
+=cut

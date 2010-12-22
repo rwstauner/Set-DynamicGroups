@@ -40,6 +40,19 @@ sub append {
 	return $self;
 }
 
+=method groups
+
+Return a hashref of each group and its members.
+
+The keys are group names and the values are array refs of members.
+
+=cut
+
+sub groups {
+	my ($self) = @_;
+	return $self->{groups};
+}
+
 1;
 
 =head1 RATIONALE

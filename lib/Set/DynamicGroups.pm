@@ -14,6 +14,14 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
+=method new
+
+Constructor.
+
+Takes no arguments.
+
+=cut
+
 sub new {
 	my ($class) = @_;
 	my $self = {

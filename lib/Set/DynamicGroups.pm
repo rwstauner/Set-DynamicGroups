@@ -42,7 +42,7 @@ sub new {
 
 	$set->append(group_name => $group_spec);
 
-Append members to the specified group.
+Append items to the specified group.
 
 =cut
 
@@ -66,17 +66,17 @@ sub append {
 	return $self;
 }
 
-=method append_members
-X<append_items>
+=method append_items
+X<append_members>
 
-Set the full list of members to the provided items.
+Append the provided items to the full list of known items.
 Arguments can be strings or array references (which will be flattened).
 
-Aliased as C<append_items>.
+Aliased as C<append_members>.
 
 =cut
 
-sub append_members {
+sub append_items {
 	my ($self, @members) = @_;
 	# use hash for uniqueness
 	my @keys = map { ref $_ ? @$_ : $_ } @members;
@@ -84,23 +84,23 @@ sub append_members {
 	@{ $self->{members} }{ @keys } = ();
 	return scalar keys %{ $self->{members} };
 }
-*append_items = \&append_members;
+*append_members = \&append_items;
 
-=method determine_members
-X<determine_items>
+=method determine_items
+X<determine_members>
 
-	$set->determine_members($group_name);
+	$set->determine_items($group_name);
 
-Return an arrayref of the members for the specified group.
+Return an arrayref of the items in the specified group.
 
 Used by L</groups> for each defined group.
 
 This method is internal and shouldn't normally be used outside of this class,
-but is aliased as C<determine_items> for consistency with other methods.
+but is aliased as C<determine_members> for consistency with other methods.
 
 =cut
 
-sub determine_members {
+sub determine_items {
 	my ($self, $name) = @_;
 
 	# TODO: Disallow infinite recursion... use an option to say which group(s)
@@ -123,13 +123,13 @@ sub determine_members {
 	# maintain order (and uniqueness)
 	return [grep { !$seen{$_}++ } @include];
 }
-*determine_items = \&determine_members;
+*determine_members = \&determine_items;
 
 sub _flatten_items {
 	my ($self, $group, $which) = @_;
 	my @items = @{ $group->{ $which } || [] };
 	if( my $items = $group->{ "${which}_groups" } ){
-		my @flat = map { @{ $self->determine_members($_) } } @$items;
+		my @flat = map { @{ $self->determine_items($_) } } @$items;
 		push(@items, @flat);
 	}
 	return \@items;
@@ -137,10 +137,10 @@ sub _flatten_items {
 
 =method groups
 
-Return a hashref of each group and its members.
+Return a hashref of each group and the items contained.
 
-The keys are group names and the values are arrayrefs of members
-as returned by L</determine_members>.
+The keys are group names and the values are arrayrefs of items
+as returned by L</determine_items>.
 
 =cut
 
@@ -150,26 +150,26 @@ sub groups {
 	my %group_specs = %{$self->{groups}};
 
 	while( my ($name, $spec) = each %group_specs ){
-		$groups{$name} = $self->determine_members($name);
+		$groups{$name} = $self->determine_items($name);
 	}
 
 	return \%groups;
 }
 
-=method members
-X<items>
+=method items
+X<members>
 
-Return an arrayref of all members.
+Return an arrayref of all known items.
 
-Aliased as C<items>.
+Aliased as C<members>.
 
 =cut
 
-sub members {
+sub items {
 	my ($self) = @_;
 	return $self->{members};
 }
-*items = \&members;
+*members = \&items;
 
 =method normalize
 
@@ -221,24 +221,24 @@ sub set {
 	$self->append(%groups);
 }
 
-=method set_members
-X<set_items>
+=method set_items
+X<set_members>
 
-Set the full list of members to the provided items.
+Set the full list of items to the provided items.
 
-This is a shortcut for removing any previous members
-and then calling L</append_members>().
+This is a shortcut for removing any previous items
+and then calling L</append_items>().
 
-Aliased as C<set_items>.
+Aliased as C<set_members>.
 
 =cut
 
-sub set_members {
+sub set_items {
 	my ($self) = shift;
-	delete $self->{members};
-	return $self->append_members(@_);
+	delete $self->{items};
+	return $self->append_items(@_);
 }
-*set_items = \&set_members;
+*set_members = \&set_items;
 
 1;
 
@@ -257,8 +257,8 @@ A single member;
 This is converted to an arrayref with one element.
 
 = I<arrayref>
-An array of members.
-This is converted into a hashref with the C<items> key.
+An array of items.
+This is converted into a hashref with the C<include> key.
 
 = I<hashref>
 Possible options:

@@ -162,10 +162,13 @@ Aliased as C<members>.
 
 sub items {
 	my ($self) = @_;
-	# flatten any explicitly specified items with all items included in groups
 	# TODO: make it an option which things are included in this list?
-	return [ map { @$_ } ($self->{items} || []),
-		map { $_->{include} || [] } values %{ $self->{groups} }];
+	my @items = @{ $self->{items} || [] };
+	# concatenate all items included in groups
+	$self->_push_unique(\@items, {},
+		map { @{ $_->{include} || [] } }
+			values %{ $self->{groups} });
+	return \@items;
 }
 *members = \&items;
 

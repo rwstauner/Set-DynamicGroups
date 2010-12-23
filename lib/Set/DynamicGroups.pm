@@ -193,6 +193,42 @@ sub normalize {
 	return $spec;
 }
 
+=method set
+
+Set a group specification to the provided value
+(resetting any previous specifications).
+
+This is a shortcut for removing any previous specifications
+and then calling L</append>().
+
+=cut
+
+sub set {
+	my ($self) = shift;
+	my %groups = ref $_[0] ? %{$_[0]} : @_;
+	delete $self->{groups}{$_} foreach keys %groups;
+	$self->append(%groups);
+}
+
+=method set_members
+X<set_items>
+
+Set the full list of members to the provided items.
+
+This is a shortcut for removing any previous members
+and then calling L</append_members>().
+
+Aliased as C<set_items>.
+
+=cut
+
+sub set_members {
+	my ($self) = shift;
+	delete $self->{members};
+	return $self->append_members(@_);
+}
+*set_items = \&set_members;
+
 1;
 
 =head1 DESCRIPTION

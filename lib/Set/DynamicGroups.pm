@@ -48,6 +48,12 @@ sub append {
 		while( my ($key, $val) = each %$spec ){
 			push(@{$group->{$key} ||= []}, @$val);
 		}
+		# if specifying that a group in(/ex)cludes items add those to the list
+		# TODO: Should this be an option?
+			foreach my $list ( qw(include exclude) ){
+				$self->append_members(@{$spec->{$list}})
+					if $self->{$list};
+			}
 	}
 	return $self;
 }

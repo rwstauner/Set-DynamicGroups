@@ -245,7 +245,7 @@ sub set_members {
 
 1;
 
-=for stopwords arrayrefs
+=for stopwords arrayrefs TODO
 
 =head1 DESCRIPTION
 
@@ -286,6 +286,11 @@ Each option can be a string which will be converted to
 an arrayref with a single element.
 
 =end :list
+
+=head1 TODO
+
+=for :list
+* Cache the group calculations to avoid redundant processing?
 
 =head1 RATIONALE
 

@@ -101,6 +101,7 @@ sub determine_items {
 
 	# TODO: Disallow infinite recursion... use an option to say which group(s)
 	# are currently in the stack?  Detect mutual dependence upon specification?
+	# name is required (rathan than ref) to push name onto anti-recursion stack
 	# push(@{ $self->{determining} ||= [] }, $name);
 	# die("Infinite recursion detected on groups: @{ $self->{determining} }");
 
@@ -108,13 +109,17 @@ sub determine_items {
 	# use hash for uniqueness
 	my %seen;
 
-	# TODO: if only exclusions are specified, populate with all items first
-
 	my @exclude = @{ $self->_flatten_items($group, 'exclude') };
 	# list assignment on a hash slice seems faster than ++$s{$_} for @a
 	@seen{ @exclude } = (1) x @exclude;
 
-	my @include = @{ $self->_flatten_items($group, 'include') };
+	# If no includes (only excludes) are specified,
+	# populate the list with all known items.
+	my @include = @{
+		(exists $group->{include} || exists $group->{include_groups})
+		? $self->_flatten_items($group, 'include')
+		: $self->items
+	};
 
 	# maintain order (and uniqueness)
 	return [grep { !$seen{$_}++ } @include];

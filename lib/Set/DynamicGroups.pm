@@ -21,6 +21,14 @@ sub new {
 	bless $self, $class;
 }
 
+my %spec_aliases = (
+	not_in  => 'exclude_groups',
+	in      => 'include_groups',
+	items   => 'include',
+	members => 'include',
+	not     => 'exclude',
+);
+
 =method append
 
 	$set->append(groupname => \@members);
@@ -130,6 +138,15 @@ sub normalize {
 	# if not a hashref, assume it's an (array of) item(s)
 	$spec = {include => $spec}
 		unless ref $spec eq 'HASH';
+
+	while( my ($alias, $name) = each %spec_aliases ){
+		if( exists($spec->{$alias}) ){
+			croak("Cannot include both an option and its alias: " .
+				"'$name' and '$alias' are mutually exclusive.")
+					if exists $spec->{$name};
+			$spec->{$name} = delete $spec->{$alias};
+		}
+	}
 
 	while( my ($key, $value) = each %$spec ){
 		# convert scalar (string) to arrayref

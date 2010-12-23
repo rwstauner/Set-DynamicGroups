@@ -56,12 +56,6 @@ sub append {
 		while( my ($key, $val) = each %$spec ){
 			push(@{$group->{$key} ||= []}, @$val);
 		}
-		# if specifying that a group in(/ex)cludes items add those to the list
-		# TODO: Should this be an option?
-			foreach my $list ( qw(include exclude) ){
-				$self->append_members(@{$spec->{$list}})
-					if $self->{$list};
-			}
 	}
 	return $self;
 }
@@ -77,12 +71,14 @@ Aliased as C<append_members>.
 =cut
 
 sub append_items {
-	my ($self, @members) = @_;
+	my ($self, @append) = @_;
+
+	my $items = ($self->{items} ||= []);
 	# use hash for uniqueness
-	my @keys = map { ref $_ ? @$_ : $_ } @members;
-	$self->{members} ||= {};
-	@{ $self->{members} }{ @keys } = ();
-	return scalar keys %{ $self->{members} };
+	my %seen = map { $_ => 1 } @$items;
+
+	push(@$items, grep { !$seen{$_}++ } map { ref $_ ? @$_ : $_ } @append);
+	return scalar @$items;
 }
 *append_members = \&append_items;
 
@@ -167,7 +163,10 @@ Aliased as C<members>.
 
 sub items {
 	my ($self) = @_;
-	return $self->{members};
+	# flatten any explicitly specified items with all items included in groups
+	# TODO: make it an option which things are included in this list?
+	return [ map { @$_ } ($self->{items} || []),
+		map { $_->{include} || [] } values %{ $self->{groups} }];
 }
 *members = \&items;
 

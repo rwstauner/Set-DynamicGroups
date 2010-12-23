@@ -91,7 +91,7 @@ X<determine_items>
 
 	$set->determine_members($group_name);
 
-Return an array ref of the members for the specified group.
+Return an arrayref of the members for the specified group.
 
 Used by L</groups> for each defined group.
 
@@ -142,7 +142,7 @@ sub determine_members {
 
 Return a hashref of each group and its members.
 
-The keys are group names and the values are array refs of members
+The keys are group names and the values are arrayrefs of members
 as returned by L</determine_members>.
 
 =cut
@@ -162,7 +162,7 @@ sub groups {
 =method members
 X<items>
 
-Return an array ref of all members.
+Return an arrayref of all members.
 
 Aliased as C<items>.
 
@@ -245,6 +245,8 @@ sub set_members {
 
 1;
 
+=for stopwords arrayrefs
+
 =head1 DESCRIPTION
 
 =head1 GROUP SPECIFICATION
@@ -255,13 +257,13 @@ A group specification can be in one of the following formats:
 
 = I<scalar>
 A single member;
-This is converted to an array ref with one element.
+This is converted to an arrayref with one element.
 
-= I<array ref>
+= I<arrayref>
 An array of members.
-This is converted into a hash ref with the C<items> key.
+This is converted into a hashref with the C<items> key.
 
-= I<hash ref>
+= I<hashref>
 Possible options:
 
 =begin :list
@@ -281,7 +283,7 @@ An arrayref of groups whose items will be excluded
 =end :list
 
 Each option can be a string which will be converted to
-an array ref with a single element.
+an arrayref with a single element.
 
 =end :list
 

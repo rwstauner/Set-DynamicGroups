@@ -14,6 +14,14 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
+our %Aliases = (
+	not_in  => 'exclude_groups',
+	in      => 'include_groups',
+	items   => 'include',
+	members => 'include',
+	not     => 'exclude',
+);
+
 =method new
 
 Constructor.
@@ -29,14 +37,6 @@ sub new {
 	};
 	bless $self, $class;
 }
-
-my %spec_aliases = (
-	not_in  => 'exclude_groups',
-	in      => 'include_groups',
-	items   => 'include',
-	members => 'include',
-	not     => 'exclude',
-);
 
 =method append
 
@@ -189,7 +189,7 @@ sub normalize {
 	$spec = {include => $spec}
 		unless ref $spec eq 'HASH';
 
-	while( my ($alias, $name) = each %spec_aliases ){
+	while( my ($alias, $name) = each %Aliases ){
 		if( exists($spec->{$alias}) ){
 			croak("Cannot include both an option and its alias: " .
 				"'$name' and '$alias' are mutually exclusive.")

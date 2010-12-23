@@ -142,12 +142,52 @@ sub normalize {
 
 1;
 
+=head1 DESCRIPTION
+
+=head1 GROUP SPECIFICATION
+
+A group specification can be in one of the following formats:
+
+=begin :list
+
+= I<scalar>
+A single member;
+This is converted to an array ref with one element.
+
+= I<array ref>
+An array of members.
+This is converted into a hash ref with the C<items> key.
+
+= I<hash ref>
+Possible options:
+
+=begin :list
+
+= C<include> (or C<items> (or C<members>))
+An arrayref of items to include in the group
+
+= C<exclude> (or C<not>)
+An arrayref of items to exclude from the group
+
+= C<include_groups> (or C<in>)
+An arrayref of groups whose items will be included
+
+= C<exclude_groups> (or C<not>)
+An arrayref of groups whose items will be excluded
+
+=end :list
+
+Each option can be a string which will be converted to
+an array ref with a single element.
+
+=end :list
+
 =head1 RATIONALE
 
 I searched for other "grouping" modules on CPAN
 but found none that supported basing one group off of another.
 Unsatisfied by the API of the modules I looked at,
-I borrowed their namespace and created my own implementation.
+I borrowed their namespace and created this implementation.
 
 =head1 SEE ALSO
 

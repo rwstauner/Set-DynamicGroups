@@ -74,10 +74,7 @@ sub append_items {
 	my ($self, @append) = @_;
 
 	my $items = ($self->{items} ||= []);
-	# use hash for uniqueness
-	my %seen = map { $_ => 1 } @$items;
-
-	push(@$items, grep { !$seen{$_}++ } map { ref $_ ? @$_ : $_ } @append);
+	$self->_push_unique($items, {}, map { ref $_ ? @$_ : $_ } @append);
 	return scalar @$items;
 }
 *append_members = \&append_items;
@@ -106,23 +103,20 @@ sub determine_items {
 	# die("Infinite recursion detected on groups: @{ $self->{determining} }");
 
 	my $group = $self->{groups}{$name};
-	# use hash for uniqueness
-	my %seen;
 
 	my @exclude = @{ $self->_flatten_items($group, 'exclude') };
-	# list assignment on a hash slice seems faster than ++$s{$_} for @a
-	@seen{ @exclude } = (1) x @exclude;
 
 	# If no includes (only excludes) are specified,
 	# populate the list with all known items.
-	my @include = @{
+	# Use _push_unique to maintain order (and uniqueness).
+	my @include;
+	$self->_push_unique(\@include, +{ map { $_ => 1 } @exclude }, @{
 		(exists $group->{include} || exists $group->{include_groups})
 		? $self->_flatten_items($group, 'include')
 		: $self->items
-	};
+	});
 
-	# maintain order (and uniqueness)
-	return [grep { !$seen{$_}++ } @include];
+	return \@include;
 }
 *determine_members = \&determine_items;
 
@@ -206,6 +200,16 @@ sub normalize {
 	}
 
 	return $spec;
+}
+
+sub _push_unique {
+	my ($self, $array, $seen, @push) = @_;
+
+	# Ignore items already present.
+	# List assignment on a hash slice benches faster than: ++$s{$_} for @a
+	@$seen{ @$array } = (1) x @$array;
+
+	push(@$array, grep { !$$seen{$_}++ } @push);
 }
 
 =method set

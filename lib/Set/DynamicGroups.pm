@@ -132,7 +132,13 @@ sub _flatten_items {
 
 =method groups
 
+	$set->groups(); # returns {groupname => \@items, ...}
+	$set->groups(@group_names);
+
 Return a hashref of each group and the items contained.
+
+Sending a list of group names will
+restrict the hashref to just those groups (instead of all).
 
 The keys are group names and the values are arrayrefs of items
 as returned by L</determine_items>.
@@ -140,11 +146,16 @@ as returned by L</determine_items>.
 =cut
 
 sub groups {
-	my ($self) = @_;
+	my ($self, @names) = @_;
 	my %groups;
 	my %group_specs = %{$self->{groups}};
 
-	while( my ($name, $spec) = each %group_specs ){
+	# if names provided, limit to those (and flatten), otherwise do all
+	@names = @names
+		? map { ref $_ ? @$_ : $_ } @names
+		: keys %group_specs;
+
+	foreach my $name ( @names ){
 		$groups{$name} = $self->determine_items($name);
 	}
 

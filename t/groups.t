@@ -41,6 +41,10 @@ is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m2 m5 m6)]
 $set->set(g3 => {not_in => [qw(g1)]});
 is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m5 m6)]}, 'exclude from group');
 
+is_deeply($set->groups(qw(g2 g3)), {g2 => [qw(m5 m6)], g3 => [qw(m5 m6)]}, 'limit groups() by names');
+is_deeply($set->groups(qw(g2)), {g2 => [qw(m5 m6)]}, 'limit groups() by names');
+is_deeply($set->groups(qw(g1 g2 g3)), $set->groups, 'limit groups() by names');
+
 is_deeply([sort @{$set->items}], [qw(m2 m5 m6)],       'all items');
 $set->append_items(qw(m6 m7));
 is_deeply([sort @{$set->items}], [qw(m2 m5 m6 m7)],    'all items (no duplicates)');

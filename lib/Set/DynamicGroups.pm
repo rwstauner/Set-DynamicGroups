@@ -32,25 +32,112 @@ Append members to the specified group.
 sub append {
 	my ($self) = shift;
 	my %groups = ref $_[0] ? %{$_[0]} : @_;
-	while( my ($group, $fields) = each %groups ){
-		$fields = [$fields]
-			unless ref $fields;
-		push(@{ $self->{groups}->{$group} ||= [] }, @$fields);
+	while( my ($name, $spec) = each %groups ){
+		$spec = $self->normalize($spec);
+		my $group = ($self->{groups}->{$name} ||= {});
+		# could use Hash::Merge, but this is a simple case:
+		while( my ($key, $val) = each %$spec ){
+			push(@{$group->{$key} ||= []}, @$val);
+		}
 	}
 	return $self;
 }
+
+=method determine_members
+X<determine_items>
+
+	$set->determine_members($group_name);
+
+Return an array ref of the members for the specified group.
+
+Used by L</groups> for each defined group.
+
+This method is internal and shouldn't normally be used outside of this class,
+but is aliased as C<determine_items> for consistency with other methods.
+
+=cut
+
+sub determine_members {
+	my ($self, $name) = @_;
+
+	# TODO: Disallow infinite recursion... use an option to say which group(s)
+	# are currently in the stack?  Detect mutual dependence upon specification?
+	# push(@{ $self->{determining} ||= [] }, $name);
+	# die("Infinite recursion detected on groups: @{ $self->{determining} }");
+
+	my $group = $self->{groups}{$name};
+	# use hash for uniqueness and ease of removal
+	my %members;
+
+	# TODO: if only exclusions are specified, populate with all items first
+
+	# add members
+	if( my $items = $group->{include} ){
+		@members{ @$items } = ();
+	}
+
+	if( my $include = $group->{include_groups} ){
+		my @in = map { @{ $self->determine_members($_) } } @$include;
+		@members{ @in } = ();
+	}
+
+	# remove members
+	if( my $items = $group->{exclude} ){
+		delete @members{ @$items };
+	}
+
+	if( my $exclude = $group->{exclude_groups} ){
+		my @ex = map { @{ $self->determine_members($_) } } @$exclude;
+		delete @members{ @ex };
+	}
+
+	return [keys %members];
+}
+*determine_items = \&determine_members;
 
 =method groups
 
 Return a hashref of each group and its members.
 
-The keys are group names and the values are array refs of members.
+The keys are group names and the values are array refs of members
+as returned by L</determine_members>.
 
 =cut
 
 sub groups {
 	my ($self) = @_;
-	return $self->{groups};
+	my %groups;
+	my %group_specs = %{$self->{groups}};
+
+	while( my ($name, $spec) = each %group_specs ){
+		$groups{$name} = $self->determine_members($name);
+	}
+
+	return \%groups;
+}
+
+=method normalize
+
+Used internally to normalize group specifications.
+
+See L</GROUP SPECIFICATION>.
+
+=cut
+
+sub normalize {
+	my ($self, $spec) = @_;
+
+	# if not a hashref, assume it's an (array of) item(s)
+	$spec = {include => $spec}
+		unless ref $spec eq 'HASH';
+
+	while( my ($key, $value) = each %$spec ){
+		# convert scalar (string) to arrayref
+		$spec->{$key} = [$value]
+			unless ref $value;
+	}
+
+	return $spec;
 }
 
 1;

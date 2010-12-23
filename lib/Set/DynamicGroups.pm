@@ -79,21 +79,7 @@ sub append_items {
 }
 *append_members = \&append_items;
 
-=method determine_items
-X<determine_members>
-
-	$set->determine_items($group_name);
-
-Return an arrayref of the items in the specified group.
-
-Used by L</groups> for each defined group.
-
-This method is internal and shouldn't normally be used outside of this class,
-but is aliased as C<determine_members> for consistency with other methods.
-
-=cut
-
-sub determine_items {
+sub _determine_items {
 	my ($self, $name) = @_;
 
 	# TODO: Disallow infinite recursion... use an option to say which group(s)
@@ -118,13 +104,12 @@ sub determine_items {
 
 	return \@include;
 }
-*determine_members = \&determine_items;
 
 sub _flatten_items {
 	my ($self, $group, $which) = @_;
 	my @items = @{ $group->{ $which } || [] };
 	if( my $items = $group->{ "${which}_groups" } ){
-		my @flat = map { @{ $self->determine_items($_) } } @$items;
+		my @flat = map { @{ $self->_determine_items($_) } } @$items;
 		push(@items, @flat);
 	}
 	return \@items;
@@ -140,8 +125,7 @@ Return a hashref of each group and the items contained.
 Sending a list of group names will
 restrict the hashref to just those groups (instead of all).
 
-The keys are group names and the values are arrayrefs of items
-as returned by L</determine_items>.
+The keys are group names and the values are arrayrefs of items.
 
 =cut
 
@@ -156,7 +140,7 @@ sub groups {
 		: keys %group_specs;
 
 	foreach my $name ( @names ){
-		$groups{$name} = $self->determine_items($name);
+		$groups{$name} = $self->_determine_items($name);
 	}
 
 	return \%groups;

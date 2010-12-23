@@ -109,34 +109,31 @@ sub determine_members {
 	# die("Infinite recursion detected on groups: @{ $self->{determining} }");
 
 	my $group = $self->{groups}{$name};
-	# use hash for uniqueness and ease of removal
-	my %members;
+	# use hash for uniqueness
+	my %seen;
 
 	# TODO: if only exclusions are specified, populate with all items first
 
-	# add members
-	if( my $items = $group->{include} ){
-		@members{ @$items } = ();
-	}
+	my @exclude = @{ $self->_flatten_items($group, 'exclude') };
+	# list assignment on a hash slice seems faster than ++$s{$_} for @a
+	@seen{ @exclude } = (1) x @exclude;
 
-	if( my $include = $group->{include_groups} ){
-		my @in = map { @{ $self->determine_members($_) } } @$include;
-		@members{ @in } = ();
-	}
+	my @include = @{ $self->_flatten_items($group, 'include') };
 
-	# remove members
-	if( my $items = $group->{exclude} ){
-		delete @members{ @$items };
-	}
-
-	if( my $exclude = $group->{exclude_groups} ){
-		my @ex = map { @{ $self->determine_members($_) } } @$exclude;
-		delete @members{ @ex };
-	}
-
-	return [keys %members];
+	# maintain order (and uniqueness)
+	return [grep { !$seen{$_}++ } @include];
 }
 *determine_items = \&determine_members;
+
+sub _flatten_items {
+	my ($self, $group, $which) = @_;
+	my @items = @{ $group->{ $which } || [] };
+	if( my $items = $group->{ "${which}_groups" } ){
+		my @flat = map { @{ $self->determine_members($_) } } @$items;
+		push(@items, @flat);
+	}
+	return \@items;
+}
 
 =method groups
 

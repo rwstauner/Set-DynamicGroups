@@ -35,4 +35,6 @@ is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)]}, 'ignore unique item
 $set->append(g2 => [qw(m5 m6)]);
 is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)]}, 'ignore unique items');
 
+is_deeply([sort @{$set->items}], [qw(m2 m5 m6)],       'all items');
+
 done_testing;

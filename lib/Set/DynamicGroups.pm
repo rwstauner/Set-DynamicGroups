@@ -54,7 +54,7 @@ sub append {
 		my $group = ($self->{groups}->{$name} ||= {});
 		# could use Hash::Merge, but this is a simple case:
 		while( my ($key, $val) = each %$spec ){
-			push(@{$group->{$key} ||= []}, @$val);
+			$self->_push_unique(($group->{$key} ||= []), {}, @$val);
 		}
 	}
 	return $self;

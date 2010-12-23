@@ -88,7 +88,10 @@ sub _determine_items {
 	# push(@{ $self->{determining} ||= [] }, $name);
 	# die("Infinite recursion detected on groups: @{ $self->{determining} }");
 
-	my $group = $self->{groups}{$name};
+	# If the group doesn't exist just return an empty arrayref
+	# rather than autovivifying and filling with the wrong items, etc.
+	return []
+		unless my $group = $self->{groups}{$name};
 
 	my @exclude = @{ $self->_flatten_items($group, 'exclude') };
 
@@ -181,6 +184,8 @@ sub normalize {
 	# if not a hashref, assume it's an (array of) item(s)
 	$spec = {include => $spec}
 		unless ref $spec eq 'HASH';
+
+	# TODO: croak if any unrecognized keys are present
 
 	while( my ($alias, $name) = each %Aliases ){
 		if( exists($spec->{$alias}) ){

@@ -64,4 +64,15 @@ is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m7 m5 m6)]
 $set->set_items(qw(m6));
 is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m6 m5)]}, 'reset items and exclude from group');
 
+# reference a group that doesn't exist
+$set->set(g3 => {not_in => [qw(g1 g0)]});
+is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m6 m5)]}, 'exclude from group (ignore non-existent)');
+
+$set->set(g4 => {in => [qw(g0)]});
+is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m6 m5)], g4 => []}, 'include from group (ignore non-existent)');
+
+$set->set(g4 => {not_in => [qw(g0)]});
+# I can't guarantee the order here, so sort it
+is_deeply([sort @{$set->groups->{g4}}], [qw(m2 m5 m6)], 'include from group (ignore non-existent)');
+
 done_testing;

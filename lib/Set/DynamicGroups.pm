@@ -6,7 +6,7 @@ package Set::DynamicGroups;
 	use Set::DynamicGroups;
 
 	my $set = Set::DynamicGroups->new();
-	$set->append(groupname => 'member1');
+	$set->append(group_name => 'member1');
 
 =cut
 
@@ -31,7 +31,7 @@ my %spec_aliases = (
 
 =method append
 
-	$set->append(groupname => \@members);
+	$set->append(group_name => $group_spec);
 
 Append members to the specified group.
 

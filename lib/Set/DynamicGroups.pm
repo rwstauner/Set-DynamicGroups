@@ -52,6 +52,26 @@ sub append {
 	return $self;
 }
 
+=method append_members
+X<append_items>
+
+Set the full list of members to the provided items.
+Arguments can be strings or array references (which will be flattened).
+
+Aliased as C<append_items>.
+
+=cut
+
+sub append_members {
+	my ($self, @members) = @_;
+	# use hash for uniqueness
+	my @keys = map { ref $_ ? @$_ : $_ } @members;
+	$self->{members} ||= {};
+	@{ $self->{members} }{ @keys } = ();
+	return scalar keys %{ $self->{members} };
+}
+*append_items = \&append_members;
+
 =method determine_members
 X<determine_items>
 
@@ -124,6 +144,21 @@ sub groups {
 
 	return \%groups;
 }
+
+=method members
+X<items>
+
+Return an array ref of all members.
+
+Aliased as C<items>.
+
+=cut
+
+sub members {
+	my ($self) = @_;
+	return $self->{members};
+}
+*items = \&members;
 
 =method normalize
 

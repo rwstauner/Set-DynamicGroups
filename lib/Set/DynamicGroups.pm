@@ -65,8 +65,19 @@ sub append {
 =method append_items
 X<append_members>
 
+	$set->append_items(qw(bob larry));
+	$set->append_items('archibald', [qw(jimmy jerry)]);
+
 Append the provided items to the full list of known items.
 Arguments can be strings or array references (which will be flattened).
+
+This is useful to include items that you know are available
+but may not be explicitly included in other groups.
+Then groups defined by exclusions will base their members off of
+all known items.
+
+Items that B<are> specified in group definitions
+do not need to be specified separately.
 
 Aliased as C<append_members>.
 

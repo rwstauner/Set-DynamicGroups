@@ -44,6 +44,8 @@ is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m5 m6)]}, 
 is_deeply($set->groups(qw(g2 g3)), {g2 => [qw(m5 m6)], g3 => [qw(m5 m6)]}, 'limit groups() by names');
 is_deeply($set->groups(qw(g2)), {g2 => [qw(m5 m6)]}, 'limit groups() by names');
 is_deeply($set->groups(qw(g1 g2 g3)), $set->groups, 'limit groups() by names');
+is_deeply($set->groups('g2')->{g2}, [$set->group('g2')], 'group() matches groups()');
+is_deeply([$set->group('g2')], [qw(m5 m6)], 'group() returns expected list');
 
 is_deeply([sort @{$set->items}], [qw(m2 m5 m6)],       'all items');
 $set->append_items(qw(m6 m7));

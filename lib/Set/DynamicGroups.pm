@@ -8,6 +8,8 @@ package Set::DynamicGroups;
 	my $set = Set::DynamicGroups->new();
 	$set->append(group_name => 'member1');
 
+	my @members = $set->group('group_name');
+
 =cut
 
 use strict;
@@ -116,6 +118,28 @@ sub _flatten_items {
 		push(@items, @flat);
 	}
 	return \@items;
+}
+
+=method group
+
+	$set->group($group_name);
+
+Return a list of the items in the specified group.
+This is a convenience method
+that calls L</groups> with the provided group name
+and returns a list (rather than a hash of arrayrefs).
+
+=cut
+
+sub group {
+	my ($self) = shift;
+	croak("group() requires a single argument.  Perhaps you want groups().")
+		if @_ != 1;
+	my ($name) = @_;
+	# get the value rather than a whole hash
+	my $items = $self->groups($name)->{$name};
+	# return a list (not an arrayref)
+	return @$items;
 }
 
 =method groups

@@ -15,11 +15,11 @@ use warnings;
 use Carp qw(croak);
 
 our %Aliases = (
-	not_in  => 'exclude_groups',
 	in      => 'include_groups',
 	items   => 'include',
 	members => 'include',
-	not     => 'exclude',
+	'not'   => 'exclude',
+	not_in  => 'exclude_groups',
 );
 
 =method new

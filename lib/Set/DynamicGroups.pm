@@ -122,12 +122,19 @@ sub _flatten_items {
 
 =method group
 
-	$set->group($group_name);
+	@items = $set->group($group_name);
 
 Return a list of the items in the specified group.
+
 This is a convenience method
 that calls L</groups> with the provided group name
 and returns a list (rather than a hash of arrayrefs).
+
+The above example is equivalent to:
+
+	@items = @{ $set->groups($group_name)->{$group_name} };
+
+except that it will die() if the specified group does not exist.
 
 =cut
 
@@ -136,6 +143,10 @@ sub group {
 	croak("group() requires a single argument.  Perhaps you want groups().")
 		if @_ != 1;
 	my ($name) = @_;
+
+	croak("Group $name is not defined")
+		unless exists $self->{groups}{$name};
+
 	# get the value rather than a whole hash
 	my $items = $self->groups($name)->{$name};
 	# return a list (not an arrayref)

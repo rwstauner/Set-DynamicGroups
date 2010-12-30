@@ -257,6 +257,19 @@ sub set_items {
 
 =head1 DESCRIPTION
 
+An instance of Set::DynamicGroups
+can manage a list of groups and the items (members) of those groups.
+It takes in various definitions of groups
+(rules about how to build the member list)
+and will return the list of items contained in any named group.
+
+The module was specifically designed to allow groups
+to be defined dynamically by rules based on other groups.
+For instance you can define one group as a list of
+all the items included in two other groups.
+You can also say that one group will be composed of
+any known members B<not> in some other group.
+
 =head1 GROUP SPECIFICATION
 
 A group specification can be in one of the following formats:

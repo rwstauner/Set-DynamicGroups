@@ -276,7 +276,7 @@ A group specification can be in one of the following formats:
 
 =begin :list
 
-= I<scalar>
+= I<string>
 A single member;
 This is converted to an arrayref with one element.
 

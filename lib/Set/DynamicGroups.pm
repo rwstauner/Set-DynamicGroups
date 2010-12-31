@@ -368,6 +368,10 @@ Each option can be a an arrayref
 or a string which will be converted to
 an arrayref with a single element.
 
+Specifications that only have C<exclude> and/or C<exclude_groups>
+will first be filled with all known items.
+(This is where L</add_items> comes in.)
+
 =end :list
 
 =head1 TODO

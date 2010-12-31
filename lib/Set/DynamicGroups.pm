@@ -378,7 +378,6 @@ will first be filled with all known items.
 
 =for :list
 * Cache the group calculations to avoid redundant processing?
-* Avoid infinite recursion when calculating mutually dependent groups.
 
 =head1 RATIONALE
 

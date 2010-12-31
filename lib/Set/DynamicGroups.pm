@@ -8,6 +8,10 @@ package Set::DynamicGroups;
 	my $set = Set::DynamicGroups->new();
 	$set->add(group_name => 'member1');
 
+	$set->add(green => ['junior', 'french peas']);
+	$set->add(blue  => {include => 'madame blueberry'});
+	$set->add(other => {not_in => [qw(blue green)]});
+
 	my @members = $set->group('group_name');
 	# or
 	my $all = $set->groups();

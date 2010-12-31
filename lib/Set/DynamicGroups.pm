@@ -98,20 +98,22 @@ sub add_items {
 *add_members    = \&add_items;
 
 sub _determine_items {
-	my ($self, $name) = @_;
+	# $name is required (rathan than ref) to push name onto anti-recursion stack
+	my ($self, $name, $current) = @_;
+	$current ||= {};
 
-	# TODO: Disallow infinite recursion... use an option to say which group(s)
-	# are currently in the stack?  Detect mutual dependence upon specification?
-	# name is required (rathan than ref) to push name onto anti-recursion stack
-	# push(@{ $self->{determining} ||= [] }, $name);
-	# die("Infinite recursion detected on groups: @{ $self->{determining} }");
+	# avoid infinite recursion...
+	# 'each' strategy:
+	return []
+		if exists $current->{$name};
+	$current->{$name} = 1;
 
 	# If the group doesn't exist just return an empty arrayref
 	# rather than autovivifying and filling with the wrong items, etc.
 	return []
 		unless my $group = $self->{groups}{$name};
 
-	my @exclude = @{ $self->_flatten_items($group, 'exclude') };
+	my @exclude = @{ $self->_flatten_items($group, 'exclude', $current) };
 
 	# If no includes (only excludes) are specified,
 	# populate the list with all known items.
@@ -119,7 +121,7 @@ sub _determine_items {
 	my @include;
 	$self->_push_unique(\@include, +{ map { $_ => 1 } @exclude }, @{
 		(exists $group->{include} || exists $group->{include_groups})
-		? $self->_flatten_items($group, 'include')
+		? $self->_flatten_items($group, 'include', $current)
 		: $self->items
 	});
 
@@ -127,10 +129,11 @@ sub _determine_items {
 }
 
 sub _flatten_items {
-	my ($self, $group, $which) = @_;
+	# $group can currently be ref (rather than name)
+	my ($self, $group, $which, $current) = @_;
 	my @items = @{ $group->{ $which } || [] };
 	if( my $items = $group->{ "${which}_groups" } ){
-		my @flat = map { @{ $self->_determine_items($_) } } @$items;
+		my @flat = map { @{ $self->_determine_items($_, $current) } } @$items;
 		push(@items, @flat);
 	}
 	return \@items;

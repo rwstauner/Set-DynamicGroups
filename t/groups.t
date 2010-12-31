@@ -80,4 +80,13 @@ $set->set(g4 => {not_in => [qw(g0)]});
 # I can't guarantee the order here, so sort it
 is_deeply([sort @{$set->groups->{g4}}], [qw(m2 m5 m6)], 'include from group (ignore non-existent)');
 
+# TODO: include 1 but exclude the rest of a group
+# b => [qw(hi there)], a => {not_in => 'b', include => 'hi'}
+
+# TODO: test the minimum require to define that a group includes 'all'
+# c => {} OR c => {exclude => []}
+
+# TODO: use one group to get all and the other group to get all minus group plus specific
+# d => {not_in => 'f', in => 'e', include => 'boo'}, e => {not => ''}, f => [qw(did ley)]
+
 done_testing;

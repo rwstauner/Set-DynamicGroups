@@ -97,6 +97,8 @@ sub add_items {
 }
 *add_members    = \&add_items;
 
+# NOTE: See L</DEPENDENCY RESOLUTION> for comments
+
 sub _determine_items {
 	# $name is required (rathan than ref) to push name onto anti-recursion stack
 	my ($self, $name, $current) = @_;
@@ -200,6 +202,7 @@ sub groups {
 		: keys %group_specs;
 
 	foreach my $name ( @names ){
+		# the 'each' dependency resolution "strategy"
 		$groups{$name} = $self->_determine_items($name);
 	}
 

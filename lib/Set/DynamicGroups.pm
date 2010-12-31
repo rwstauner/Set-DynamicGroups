@@ -318,11 +318,11 @@ sub set_items {
 
 =head1 DESCRIPTION
 
-An instance of Set::DynamicGroups
+An instance of C<Set::DynamicGroups>
 can manage a list of groups and the items (members) of those groups.
 It takes in various definitions of groups
-(rules about how to build the member list)
-and will return the list of items contained in any named group.
+(rules about how to build the member list (see L</GROUP SPECIFICATION>))
+and will return the list of items contained in any named groups.
 
 The module was specifically designed to allow groups
 to be defined dynamically by rules based on other groups.

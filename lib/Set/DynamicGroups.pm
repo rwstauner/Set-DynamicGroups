@@ -208,6 +208,9 @@ X<members>
 
 Return an arrayref of all known items.
 
+This includes any items specified explicitly with L</add_items>
+as well all items explicitly C<include>d in group specifications.
+
 Aliased as C<members>.
 
 =cut

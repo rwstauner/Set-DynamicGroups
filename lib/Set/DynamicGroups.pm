@@ -512,7 +512,7 @@ See L</DEPENDENCY RESOLUTION> for the current discussion on the topic.
 
 Currently everything is calculated upon request.
 This may be an important part of one of the dependency resolution strategies,
-but if any time it is not,
+but if at any time it is not,
 then it's merely inefficient.
 
 =head1 RATIONALE

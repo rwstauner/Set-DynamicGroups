@@ -9,6 +9,8 @@ package Set::DynamicGroups;
 	$set->append(group_name => 'member1');
 
 	my @members = $set->group('group_name');
+	# or
+	my $all = $set->groups();
 
 =cut
 
@@ -263,6 +265,8 @@ sub _push_unique {
 
 =method set
 
+	$set->set(group_name => $group_spec);
+
 Set a group specification to the provided value
 (resetting any previous specifications).
 
@@ -280,6 +284,8 @@ sub set {
 
 =method set_items
 X<set_members>
+
+	$set->set_items(@items);
 
 Set the full list of items to the provided items.
 

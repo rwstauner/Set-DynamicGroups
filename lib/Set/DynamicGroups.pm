@@ -368,6 +368,7 @@ an arrayref with a single element.
 
 =for :list
 * Cache the group calculations to avoid redundant processing?
+* Avoid infinite recursion when calculating mutually dependent groups.
 
 =head1 RATIONALE
 

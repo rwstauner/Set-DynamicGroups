@@ -28,6 +28,8 @@ our %Aliases = (
 
 =method new
 
+	my $set = Set::DynamicGroups->new();
+
 Constructor.
 
 Takes no arguments.

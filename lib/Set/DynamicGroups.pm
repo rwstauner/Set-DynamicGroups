@@ -184,6 +184,9 @@ restrict the hashref to just those groups (instead of all).
 
 The keys are group names and the values are arrayrefs of items.
 
+See L</DEPENDENCY RESOLUTION> for a discussion on
+the way members are determined for mutually dependent groups.
+
 =cut
 
 sub groups {

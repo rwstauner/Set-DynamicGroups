@@ -374,6 +374,117 @@ will first be filled with all known items.
 
 =end :list
 
+=head1 DEPENDENCY RESOLUTION
+
+The main impetus for the design of this module
+was the desire to define groups dependent
+on the definition of other groups.
+
+This appears to work for the limited test cases I have come up with.
+
+However, mutually dependent groups present a problem.
+
+I<< (If you're not dealing with mutually dependent groups
+feel free to skip this section.) >>
+
+In order to avoid infinite recursion when determining a group's members
+a dependency resolution strategy is needed.
+
+I have not determined a I<canonical> strategy,
+but imagine that multiple could be argued for,
+and perhaps an option/attribute on the object would be the most useful.
+
+I do not have a use-case for mutually dependent groups,
+so I have put little thought (and even less code) into it.
+
+What follows is the discussion I've had so far
+(with the two plush penguins on my desk):
+
+Possible strategies:
+
+=begin :list
+
+* I<die> / I<croak> / I<stop>
+C<croak()> if a mutual dependency is found.
+
+Simple, but possibly not always the most helpful.
+
+* I<each> / I<more>
+Try to determine each group's members independently of any other groups.
+This often results in groups getting I<more> members (than I<less>).
+
+	b => {in => 'c'}
+	c => {not_in => 'b', include => 'cat'}
+
+	# result:
+	#   b => ['cat']
+	#   c => ['cat']
+
+Why?
+If we start with C<b>:
+
+=for :list
+* C<b> will try to resolve C<c>
+* C<c> will include C<cat> and then try to resolve C<b>
+* Since C<b> is already in the stack it cannot be resolved and returns C<[]>
+* C<c> finishes as C<['cat']>
+* C<b> included C<['cat']> (from C<c>)
+* C<b> finishes as C<['cat']>
+
+Then C will try to resolve itself independently:
+
+=for :list
+* C<c> will include C<cat> and then try to resolve C<b>
+* C<b> will try to resolve C<c>
+* Since C<c> is already in the stack it cannot be resolved and returns C<[]>
+* C<b> finished as C<[]>
+* C<c> included C<['cat']> and excluded C<[]> (from C<b>)
+* C<c> finishes as C<['cat']>
+
+It may not seem quite right that C<b> and C<c> end up equaling each other,
+but honestly what would you expect from those definitions
+(besides infinite recursion)?
+
+* I<once>? / I<less>?
+Determine each group once rather than restarting for each group.
+This may involve passing the entire stack of resolutions-thus-far
+instead of just the names currently being resolved.
+I haven't really determined if this could work reliably
+or what exactly would happen.
+
+* I<includes_first>
+First do the includes (the easy part) for each group,
+then go through them all again and try to resolve groups
+from what we have thus far.
+
+This I<might> turn out differently than C<each>,
+though I have not contemplated the actual implementation.
+
+* I<hard>
+Try B<hard> to determine the members for each group.
+Start with the C<include>s,
+then make a stack of all the groups
+and process each group...
+If a group finishes successfully
+(rather than exiting early to avoid infinite recursion)
+remove it from the stack.
+Keep looping over the stack
+attempting to process each group until all have been removed
+or until a full loop through the stack removes none.
+
+Then resort to one of the other strategies to resolve any remaining groups.
+
+=end :list
+
+The current implementation is C<each> (C<more>)
+because that is what I determined to be happening at my first attempt
+to stop the infinite recursion.
+
+If you have ideas on strategies, implementations, or test cases
+feel free to send me your thoughts.
+
+As always, patches are welcome.
+
 =head1 TODO
 
 =for :list

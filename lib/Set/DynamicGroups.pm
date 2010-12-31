@@ -485,10 +485,15 @@ feel free to send me your thoughts.
 
 As always, patches are welcome.
 
-=head1 TODO
+=head1 BUGS AND LIMITATIONS
 
-=for :list
-* Cache the group calculations to avoid redundant processing?
+Possibly a lot if you get really complex with group dependencies.
+See L</DEPENDENCY RESOLUTION> for the current discussion on the topic.
+
+Currently everything is calculated upon request.
+This may be an important part of one of the dependency resolution strategies,
+but if any time it is not,
+then it's merely inefficient.
 
 =head1 RATIONALE
 

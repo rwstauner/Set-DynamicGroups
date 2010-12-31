@@ -48,6 +48,9 @@ sub new {
 
 Append items to the specified group.
 
+See L</GROUP SPECIFICATION> for details
+on the possible values of C<$group_spec>.
+
 =cut
 
 sub append {
@@ -355,7 +358,8 @@ An arrayref of groups whose items will be excluded
 
 =end :list
 
-Each option can be a string which will be converted to
+Each option can be a an arrayref
+or a string which will be converted to
 an arrayref with a single element.
 
 =end :list

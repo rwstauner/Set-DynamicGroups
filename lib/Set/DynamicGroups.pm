@@ -6,7 +6,7 @@ package Set::DynamicGroups;
 	use Set::DynamicGroups;
 
 	my $set = Set::DynamicGroups->new();
-	$set->append(group_name => 'member1');
+	$set->add(group_name => 'member1');
 
 	my @members = $set->group('group_name');
 	# or
@@ -42,18 +42,18 @@ sub new {
 	bless $self, $class;
 }
 
-=method append
+=method add
 
-	$set->append(group_name => $group_spec);
+	$set->add(group_name => $group_spec);
 
-Append items to the specified group.
+Add items to the specified group.
 
 See L</GROUP SPECIFICATION> for details
 on the possible values of C<$group_spec>.
 
 =cut
 
-sub append {
+sub add {
 	my ($self) = shift;
 	my %groups = ref $_[0] ? %{$_[0]} : @_;
 	while( my ($name, $spec) = each %groups ){
@@ -67,13 +67,13 @@ sub append {
 	return $self;
 }
 
-=method append_items
-X<append_members>
+=method add_items
+X<add_members>
 
-	$set->append_items(qw(bob larry));
-	$set->append_items('archibald', [qw(jimmy jerry)]);
+	$set->add_items(qw(bob larry));
+	$set->add_items('archibald', [qw(jimmy jerry)]);
 
-Append the provided items to the full list of known items.
+Add the provided items to the full list of known items.
 Arguments can be strings or array references (which will be flattened).
 
 This is useful to include items that you know are available
@@ -84,18 +84,18 @@ all known items.
 Items that B<are> specified in group definitions
 do not need to be specified separately.
 
-Aliased as C<append_members>.
+Aliased as C<add_members>.
 
 =cut
 
-sub append_items {
+sub add_items {
 	my ($self, @append) = @_;
 
 	my $items = ($self->{items} ||= []);
 	$self->_push_unique($items, {}, map { ref $_ ? @$_ : $_ } @append);
 	return scalar @$items;
 }
-*append_members = \&append_items;
+*add_members    = \&add_items;
 
 sub _determine_items {
 	my ($self, $name) = @_;
@@ -274,7 +274,7 @@ Set a group specification to the provided value
 (resetting any previous specifications).
 
 This is a shortcut for removing any previous specifications
-and then calling L</append>().
+and then calling L</add>().
 
 =cut
 
@@ -282,7 +282,7 @@ sub set {
 	my ($self) = shift;
 	my %groups = ref $_[0] ? %{$_[0]} : @_;
 	delete $self->{groups}{$_} foreach keys %groups;
-	$self->append(%groups);
+	$self->add(%groups);
 }
 
 =method set_items
@@ -293,7 +293,7 @@ X<set_members>
 Set the full list of items to the provided items.
 
 This is a shortcut for removing any previous items
-and then calling L</append_items>().
+and then calling L</add_items>().
 
 Aliased as C<set_members>.
 
@@ -302,7 +302,7 @@ Aliased as C<set_members>.
 sub set_items {
 	my ($self) = shift;
 	delete $self->{items};
-	return $self->append_items(@_);
+	return $self->add_items(@_);
 }
 *set_members = \&set_items;
 

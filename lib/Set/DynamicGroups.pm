@@ -235,7 +235,13 @@ sub items {
 
 =method normalize
 
+	$norm_spec = $set->normalize($group_spec);
+
 Used internally to normalize group specifications.
+
+Upgrades a string to an arrayref.
+Upgrades an arrayref to a hash.
+Renames aliases to the canonical keys.
 
 See L</GROUP SPECIFICATION>.
 
@@ -244,7 +250,7 @@ See L</GROUP SPECIFICATION>.
 sub normalize {
 	my ($self, $spec) = @_;
 
-	# if not a hashref, assume it's an (array of) item(s)
+	# if not a hashref, assume it's an (arrayref of) item(s)
 	$spec = {include => $spec}
 		unless ref $spec eq 'HASH';
 

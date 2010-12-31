@@ -296,7 +296,7 @@ Set a group specification to the provided value
 (resetting any previous specifications).
 
 This is a shortcut for removing any previous specifications
-and then calling L</add>().
+and then calling L</add>.
 
 =cut
 
@@ -315,7 +315,7 @@ X<set_members>
 Set the full list of items to the provided items.
 
 This is a shortcut for removing any previous items
-and then calling L</add_items>().
+and then calling L</add_items>.
 
 Aliased as C<set_members>.
 

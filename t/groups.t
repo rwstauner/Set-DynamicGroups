@@ -50,11 +50,11 @@ is_deeply([$set->group('g2')], [qw(m5 m6)], 'group() returns expected list');
 is(eval { $set->group('idunno'); 1 }, undef, 'unknown group() dies');
 like($@, qr/Group .+ is not defined/, 'unknown group() died with expected message');
 
-is_deeply([sort @{$set->items}], [qw(m2 m5 m6)],       'all items');
+is_deeply([sort $set->items], [qw(m2 m5 m6)],       'all items');
 $set->add_items(qw(m6 m7));
-is_deeply([sort @{$set->items}], [qw(m2 m5 m6 m7)],    'all items (no duplicates)');
+is_deeply([sort $set->items], [qw(m2 m5 m6 m7)],    'all items (no duplicates)');
 $set->add_items(qw(m6 m7 m8));
-is_deeply([sort @{$set->items}], [qw(m2 m5 m6 m7 m8)], 'all items (no duplicates)');
+is_deeply([sort $set->items], [qw(m2 m5 m6 m7 m8)], 'all items (no duplicates)');
 
 $set->set(g3 => {in => [qw(g1 g2)]});
 is_deeply($set->groups, {g1 => [qw(m2)], g2 => [qw(m5 m6)], g3 => [qw(m2 m5 m6)]}, 'include from group');

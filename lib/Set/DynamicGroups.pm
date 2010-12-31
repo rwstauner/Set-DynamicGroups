@@ -117,17 +117,17 @@ sub _determine_items {
 	return []
 		unless my $group = $self->{groups}{$name};
 
-	my @exclude = @{ $self->_flatten_items($group, 'exclude', $current) };
+	my @exclude = $self->_flatten_items($group, 'exclude', $current);
 
 	# If no includes (only excludes) are specified,
 	# populate the list with all known items.
 	# Use _push_unique to maintain order (and uniqueness).
 	my @include;
-	$self->_push_unique(\@include, +{ map { $_ => 1 } @exclude }, @{
+	$self->_push_unique(\@include, +{ map { $_ => 1 } @exclude },
 		(exists $group->{include} || exists $group->{include_groups})
 		? $self->_flatten_items($group, 'include', $current)
 		: $self->items
-	});
+	);
 
 	return \@include;
 }
@@ -140,7 +140,7 @@ sub _flatten_items {
 		my @flat = map { @{ $self->_determine_items($_, $current) } } @$items;
 		push(@items, @flat);
 	}
-	return \@items;
+	return @items;
 }
 
 =method group
@@ -214,7 +214,9 @@ sub groups {
 =method items
 X<members>
 
-Return an arrayref of all known items.
+	my @items = $set->items();
+
+Return a list of all known items.
 
 This includes any items specified explicitly with L</add_items>
 as well all items explicitly C<include>d in group specifications.
@@ -231,7 +233,7 @@ sub items {
 	$self->_push_unique(\@items, {},
 		map { @{ $_->{include} || [] } }
 			values %{ $self->{groups} });
-	return \@items;
+	return @items;
 }
 *members = \&items;
 

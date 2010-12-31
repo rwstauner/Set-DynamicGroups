@@ -425,7 +425,7 @@ Possible strategies:
 =begin :list
 
 * I<die> / I<croak> / I<stop>
-C<croak()> if a mutual dependency is found.
+C<croak> if a mutual dependency is found.
 
 Simple, but possibly not always the most helpful.
 

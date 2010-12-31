@@ -157,7 +157,7 @@ The above example is equivalent to:
 
 	@items = @{ $set->groups($group_name)->{$group_name} };
 
-except that it will die() if the specified group does not exist.
+except that it will C<croak> if the specified group does not exist.
 
 =cut
 

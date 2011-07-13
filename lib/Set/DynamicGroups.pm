@@ -1,23 +1,6 @@
 package Set::DynamicGroups;
 # ABSTRACT: Manage groups of items dynamically
 
-=head1 SYNOPSIS
-
-	use Set::DynamicGroups;
-
-	my $set = Set::DynamicGroups->new();
-	$set->add(group_name => 'member1');
-
-	$set->add(green => ['junior', 'french peas']);
-	$set->add(blue  => {include => 'madame blueberry'});
-	$set->add(other => {not_in => [qw(blue green)]});
-
-	my @members = $set->group('group_name');
-	# or
-	my $all = $set->groups();
-
-=cut
-
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -335,6 +318,21 @@ sub set_items {
 1;
 
 =for stopwords arrayrefs TODO
+
+=head1 SYNOPSIS
+
+  use Set::DynamicGroups;
+
+  my $set = Set::DynamicGroups->new();
+  $set->add(group_name => 'member1');
+
+  $set->add(green => ['junior', 'french peas']);
+  $set->add(blue  => {include => 'madame blueberry'});
+  $set->add(other => {not_in => [qw(blue green)]});
+
+  my @members = $set->group('group_name');
+  # or
+  my $all = $set->groups();
 
 =head1 DESCRIPTION
 

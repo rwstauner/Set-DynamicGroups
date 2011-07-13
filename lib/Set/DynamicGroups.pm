@@ -1,3 +1,4 @@
+# vim: set ts=2 sts=2 sw=2 expandtab smarttab:
 use strict;
 use warnings;
 
@@ -7,16 +8,16 @@ package Set::DynamicGroups;
 use Carp qw(croak);
 
 our %Aliases = (
-	in      => 'include_groups',
-	items   => 'include',
-	members => 'include',
-	'not'   => 'exclude',
-	not_in  => 'exclude_groups',
+  in      => 'include_groups',
+  items   => 'include',
+  members => 'include',
+  'not'   => 'exclude',
+  not_in  => 'exclude_groups',
 );
 
 =method new
 
-	my $set = Set::DynamicGroups->new();
+  my $set = Set::DynamicGroups->new();
 
 Constructor.
 
@@ -25,16 +26,16 @@ Takes no arguments.
 =cut
 
 sub new {
-	my ($class) = @_;
-	my $self = {
-		groups => {},
-	};
-	bless $self, $class;
+  my ($class) = @_;
+  my $self = {
+    groups => {},
+  };
+  bless $self, $class;
 }
 
 =method add
 
-	$set->add(group_name => $group_spec);
+  $set->add(group_name => $group_spec);
 
 Add items to the specified group.
 
@@ -44,24 +45,24 @@ on the possible values of C<$group_spec>.
 =cut
 
 sub add {
-	my ($self) = shift;
-	my %groups = ref $_[0] ? %{$_[0]} : @_;
-	while( my ($name, $spec) = each %groups ){
-		$spec = $self->normalize($spec);
-		my $group = ($self->{groups}->{$name} ||= {});
-		# could use Hash::Merge, but this is a simple case:
-		while( my ($key, $val) = each %$spec ){
-			$self->_push_unique(($group->{$key} ||= []), {}, @$val);
-		}
-	}
-	return $self;
+  my ($self) = shift;
+  my %groups = ref $_[0] ? %{$_[0]} : @_;
+  while( my ($name, $spec) = each %groups ){
+    $spec = $self->normalize($spec);
+    my $group = ($self->{groups}->{$name} ||= {});
+    # could use Hash::Merge, but this is a simple case:
+    while( my ($key, $val) = each %$spec ){
+      $self->_push_unique(($group->{$key} ||= []), {}, @$val);
+    }
+  }
+  return $self;
 }
 
 =method add_items
 X<add_members>
 
-	$set->add_items(qw(bob larry));
-	$set->add_items('archibald', [qw(jimmy jerry)]);
+  $set->add_items(qw(bob larry));
+  $set->add_items('archibald', [qw(jimmy jerry)]);
 
 Add the provided items to the full list of known items.
 Arguments can be strings or array references (which will be flattened).
@@ -79,61 +80,61 @@ Aliased as C<add_members>.
 =cut
 
 sub add_items {
-	my ($self, @append) = @_;
+  my ($self, @append) = @_;
 
-	my $items = ($self->{items} ||= []);
-	$self->_push_unique($items, {}, map { ref $_ ? @$_ : $_ } @append);
-	return scalar @$items;
+  my $items = ($self->{items} ||= []);
+  $self->_push_unique($items, {}, map { ref $_ ? @$_ : $_ } @append);
+  return scalar @$items;
 }
 *add_members    = \&add_items;
 
 # NOTE: See L</DEPENDENCY RESOLUTION> for comments
 
 sub _determine_items {
-	# $name is required (rathan than ref) to push name onto anti-recursion stack
-	my ($self, $name, $current) = @_;
-	$current ||= {};
+  # $name is required (rathan than ref) to push name onto anti-recursion stack
+  my ($self, $name, $current) = @_;
+  $current ||= {};
 
-	# avoid infinite recursion...
-	# 'each' strategy:
-	return []
-		if exists $current->{$name};
-	$current->{$name} = 1;
+  # avoid infinite recursion...
+  # 'each' strategy:
+  return []
+    if exists $current->{$name};
+  $current->{$name} = 1;
 
-	# If the group doesn't exist just return an empty arrayref
-	# rather than autovivifying and filling with the wrong items, etc.
-	return []
-		unless my $group = $self->{groups}{$name};
+  # If the group doesn't exist just return an empty arrayref
+  # rather than autovivifying and filling with the wrong items, etc.
+  return []
+    unless my $group = $self->{groups}{$name};
 
-	my @exclude = $self->_flatten_items($group, 'exclude', $current);
+  my @exclude = $self->_flatten_items($group, 'exclude', $current);
 
-	# If no includes (only excludes) are specified,
-	# populate the list with all known items.
-	# Use _push_unique to maintain order (and uniqueness).
-	my @include;
-	$self->_push_unique(\@include, +{ map { $_ => 1 } @exclude },
-		(exists $group->{include} || exists $group->{include_groups})
-		? $self->_flatten_items($group, 'include', $current)
-		: $self->items
-	);
+  # If no includes (only excludes) are specified,
+  # populate the list with all known items.
+  # Use _push_unique to maintain order (and uniqueness).
+  my @include;
+  $self->_push_unique(\@include, +{ map { $_ => 1 } @exclude },
+    (exists $group->{include} || exists $group->{include_groups})
+    ? $self->_flatten_items($group, 'include', $current)
+    : $self->items
+  );
 
-	return \@include;
+  return \@include;
 }
 
 sub _flatten_items {
-	# $group can currently be ref (rather than name)
-	my ($self, $group, $which, $current) = @_;
-	my @items = @{ $group->{ $which } || [] };
-	if( my $items = $group->{ "${which}_groups" } ){
-		my @flat = map { @{ $self->_determine_items($_, $current) } } @$items;
-		push(@items, @flat);
-	}
-	return @items;
+  # $group can currently be ref (rather than name)
+  my ($self, $group, $which, $current) = @_;
+  my @items = @{ $group->{ $which } || [] };
+  if( my $items = $group->{ "${which}_groups" } ){
+    my @flat = map { @{ $self->_determine_items($_, $current) } } @$items;
+    push(@items, @flat);
+  }
+  return @items;
 }
 
 =method group
 
-	@items = $set->group($group_name);
+  @items = $set->group($group_name);
 
 Return a list of the items in the specified group.
 
@@ -143,31 +144,31 @@ and returns a list (rather than a hash of arrayrefs).
 
 The above example is equivalent to:
 
-	@items = @{ $set->groups($group_name)->{$group_name} };
+  @items = @{ $set->groups($group_name)->{$group_name} };
 
 except that it will C<croak> if the specified group does not exist.
 
 =cut
 
 sub group {
-	my ($self) = shift;
-	croak("group() requires a single argument.  Perhaps you want groups().")
-		if @_ != 1;
-	my ($name) = @_;
+  my ($self) = shift;
+  croak("group() requires a single argument.  Perhaps you want groups().")
+    if @_ != 1;
+  my ($name) = @_;
 
-	croak("Group $name is not defined")
-		unless exists $self->{groups}{$name};
+  croak("Group $name is not defined")
+    unless exists $self->{groups}{$name};
 
-	# get the value rather than a whole hash
-	my $items = $self->groups($name)->{$name};
-	# return a list (not an arrayref)
-	return @$items;
+  # get the value rather than a whole hash
+  my $items = $self->groups($name)->{$name};
+  # return a list (not an arrayref)
+  return @$items;
 }
 
 =method groups
 
-	$set->groups(); # returns {groupname => \@items, ...}
-	$set->groups(@group_names);
+  $set->groups(); # returns {groupname => \@items, ...}
+  $set->groups(@group_names);
 
 Return a hashref of each group and the items contained.
 
@@ -182,27 +183,27 @@ the way members are determined for mutually dependent groups.
 =cut
 
 sub groups {
-	my ($self, @names) = @_;
-	my %groups;
-	my %group_specs = %{$self->{groups}};
+  my ($self, @names) = @_;
+  my %groups;
+  my %group_specs = %{$self->{groups}};
 
-	# if names provided, limit to those (and flatten), otherwise do all
-	@names = @names
-		? map { ref $_ ? @$_ : $_ } @names
-		: keys %group_specs;
+  # if names provided, limit to those (and flatten), otherwise do all
+  @names = @names
+    ? map { ref $_ ? @$_ : $_ } @names
+    : keys %group_specs;
 
-	foreach my $name ( @names ){
-		# the 'each' dependency resolution "strategy"
-		$groups{$name} = $self->_determine_items($name);
-	}
+  foreach my $name ( @names ){
+    # the 'each' dependency resolution "strategy"
+    $groups{$name} = $self->_determine_items($name);
+  }
 
-	return \%groups;
+  return \%groups;
 }
 
 =method items
 X<members>
 
-	my @items = $set->items();
+  my @items = $set->items();
 
 Return a list of all known items.
 
@@ -214,20 +215,20 @@ Aliased as C<members>.
 =cut
 
 sub items {
-	my ($self) = @_;
-	# TODO: make it an option which things are included in this list?
-	my @items = @{ $self->{items} || [] };
-	# concatenate all items included in groups
-	$self->_push_unique(\@items, {},
-		map { @{ $_->{include} || [] } }
-			values %{ $self->{groups} });
-	return @items;
+  my ($self) = @_;
+  # TODO: make it an option which things are included in this list?
+  my @items = @{ $self->{items} || [] };
+  # concatenate all items included in groups
+  $self->_push_unique(\@items, {},
+    map { @{ $_->{include} || [] } }
+      values %{ $self->{groups} });
+  return @items;
 }
 *members = \&items;
 
 =method normalize
 
-	$norm_spec = $set->normalize($group_spec);
+  $norm_spec = $set->normalize($group_spec);
 
 Used internally to normalize group specifications.
 
@@ -240,45 +241,45 @@ See L</GROUP SPECIFICATION>.
 =cut
 
 sub normalize {
-	my ($self, $spec) = @_;
+  my ($self, $spec) = @_;
 
-	# if not a hashref, assume it's an (arrayref of) item(s)
-	$spec = {include => $spec}
-		unless ref $spec eq 'HASH';
+  # if not a hashref, assume it's an (arrayref of) item(s)
+  $spec = {include => $spec}
+    unless ref $spec eq 'HASH';
 
-	# TODO: croak if any unrecognized keys are present
+  # TODO: croak if any unrecognized keys are present
 
-	while( my ($alias, $name) = each %Aliases ){
-		if( exists($spec->{$alias}) ){
-			croak("Cannot include both an option and its alias: " .
-				"'$name' and '$alias' are mutually exclusive.")
-					if exists $spec->{$name};
-			$spec->{$name} = delete $spec->{$alias};
-		}
-	}
+  while( my ($alias, $name) = each %Aliases ){
+    if( exists($spec->{$alias}) ){
+      croak("Cannot include both an option and its alias: " .
+        "'$name' and '$alias' are mutually exclusive.")
+          if exists $spec->{$name};
+      $spec->{$name} = delete $spec->{$alias};
+    }
+  }
 
-	while( my ($key, $value) = each %$spec ){
-		# convert scalar (string) to arrayref
-		$spec->{$key} = [$value]
-			unless ref $value;
-	}
+  while( my ($key, $value) = each %$spec ){
+    # convert scalar (string) to arrayref
+    $spec->{$key} = [$value]
+      unless ref $value;
+  }
 
-	return $spec;
+  return $spec;
 }
 
 sub _push_unique {
-	my ($self, $array, $seen, @push) = @_;
+  my ($self, $array, $seen, @push) = @_;
 
-	# Ignore items already present.
-	# List assignment on a hash slice benches faster than: ++$s{$_} for @a
-	@$seen{ @$array } = (1) x @$array;
+  # Ignore items already present.
+  # List assignment on a hash slice benches faster than: ++$s{$_} for @a
+  @$seen{ @$array } = (1) x @$array;
 
-	push(@$array, grep { !$$seen{$_}++ } @push);
+  push(@$array, grep { !$$seen{$_}++ } @push);
 }
 
 =method set
 
-	$set->set(group_name => $group_spec);
+  $set->set(group_name => $group_spec);
 
 Set a group specification to the provided value
 (resetting any previous specifications).
@@ -289,16 +290,16 @@ and then calling L</add>.
 =cut
 
 sub set {
-	my ($self) = shift;
-	my %groups = ref $_[0] ? %{$_[0]} : @_;
-	delete $self->{groups}{$_} foreach keys %groups;
-	$self->add(%groups);
+  my ($self) = shift;
+  my %groups = ref $_[0] ? %{$_[0]} : @_;
+  delete $self->{groups}{$_} foreach keys %groups;
+  $self->add(%groups);
 }
 
 =method set_items
 X<set_members>
 
-	$set->set_items(@items);
+  $set->set_items(@items);
 
 Set the full list of items to the provided items.
 
@@ -310,9 +311,9 @@ Aliased as C<set_members>.
 =cut
 
 sub set_items {
-	my ($self) = shift;
-	delete $self->{items};
-	return $self->add_items(@_);
+  my ($self) = shift;
+  delete $self->{items};
+  return $self->add_items(@_);
 }
 *set_members = \&set_items;
 
@@ -432,12 +433,12 @@ Simple, but possibly not always the most helpful.
 Try to determine each group's members independently of any other groups.
 This often results in groups getting I<more> members (than I<less>).
 
-	b => {in => 'c'}
-	c => {not_in => 'b', include => 'cat'}
+  b => {in => 'c'}
+  c => {not_in => 'b', include => 'cat'}
 
-	# result:
-	#   b => ['cat']
-	#   c => ['cat']
+  # result:
+  #   b => ['cat']
+  #   c => ['cat']
 
 Why?
 If we start with C<b>:

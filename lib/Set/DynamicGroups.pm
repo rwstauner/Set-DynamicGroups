@@ -1,8 +1,9 @@
+use strict;
+use warnings;
+
 package Set::DynamicGroups;
 # ABSTRACT: Manage groups of items dynamically
 
-use strict;
-use warnings;
 use Carp qw(croak);
 
 our %Aliases = (
